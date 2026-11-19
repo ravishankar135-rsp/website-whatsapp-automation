@@ -1,4 +1,3 @@
-
 const Database = require("better-sqlite3");
 const path = require("path");
 
@@ -25,6 +24,11 @@ db.exec(`
     request_date TEXT NOT NULL,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS app_state (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
 `);
 
 function hasUpdate(id) {
@@ -44,6 +48,28 @@ function saveUpdate(item) {
     item.link,
     item.publishedAt || null
   );
+}
+
+function getUpdateCount() {
+  return db.prepare(
+    "SELECT COUNT(*) AS total FROM updates"
+  ).get().total;
+}
+
+function isBaselineComplete() {
+  const row = db.prepare(
+    "SELECT value FROM app_state WHERE key = ?"
+  ).get("rss_baseline_complete");
+
+  return row?.value === "true";
+}
+
+function markBaselineComplete() {
+  db.prepare(`
+    INSERT INTO app_state (key, value)
+    VALUES (?, ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `).run("rss_baseline_complete", "true");
 }
 
 function getTodayAIUsage() {
@@ -75,6 +101,9 @@ module.exports = {
   db,
   hasUpdate,
   saveUpdate,
+  getUpdateCount,
+  isBaselineComplete,
+  markBaselineComplete,
   getTodayAIUsage,
   recordAIRequest
 };
