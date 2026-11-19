@@ -1,0 +1,11 @@
+
+{
+  "sources": [
+    {
+      "name": "BBC World",
+      "type": "rss",
+      "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+      "enabled": true
+    }
+  ]
+}

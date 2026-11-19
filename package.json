@@ -1,0 +1,30 @@
+{
+  "name": "website-whatsapp-automation",
+  "version": "1.0.0",
+  "description": "Free and self-hosted website monitoring with AI-powered news rewriting and WhatsApp delivery.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "node --test",
+    "pair": "node src/whatsapp/connect.js"
+  },
+  "keywords": [
+    "website-monitoring",
+    "whatsapp-automation",
+    "rss",
+    "gemini-ai",
+    "news-automation",
+    "nodejs"
+  ],
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "axios": "^1.21.1",
+    "better-sqlite3": "^13.1.1",
+    "cheerio": "^1.2.0",
+    "dotenv": "^18.0.10",
+    "qrcode-terminal": "^0.12.0",
+    "rss-parser": "^3.13.0"
+  }
+}
