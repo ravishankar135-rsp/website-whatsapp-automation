@@ -74,7 +74,7 @@ Edit `config/sources.json`. The repository includes a real BBC World RSS feed as
 
 You can add or disable RSS sources. Only add feeds you are permitted to access.
 
-On a fresh installation, the local database is empty. The first check can therefore treat an already-published feed item as new; review the first-run behavior before enabling live delivery.
+On a fresh installation, the first successful feed check saves the current RSS items as a baseline without sending them. Only items appearing in later checks are eligible for delivery. If a feed cannot be fetched, baseline initialization is postponed until a successful check. Existing databases are preserved during upgrades.
 
 ## WhatsApp pairing
 
