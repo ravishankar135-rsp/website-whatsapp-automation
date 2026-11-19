@@ -1,293 +1,119 @@
-\# Website-to-WhatsApp Automation
+# Website-to-WhatsApp Automation
 
+A self-hosted Windows automation tool that monitors configured RSS feeds, rewrites new items in Hindi with Google Gemini, and sends concise updates to a WhatsApp group.
 
+## Features
 
-Automate website and RSS monitoring, rewrite new updates with Google Gemini AI, and deliver concise messages to a WhatsApp group.
+- Monitor configurable RSS feeds.
+- Rewrite news in concise, neutral Hindi using Google Gemini.
+- Send updates to a configured WhatsApp group.
+- Track processed items and AI request usage in a local SQLite database.
+- Check feeds every 10 hours.
+- Send at most one news item per monitoring cycle.
+- Apply an application-level limit of 3 Gemini requests per day.
+- Keep API credentials, WhatsApp session data, database files, and logs local.
+- Support hidden background startup on Windows through Task Scheduler.
 
+## Requirements
 
+- Windows 10 or later
+- Node.js 20 or later
+- Python 3 with the Windows Python Launcher (`py`)
+- A WhatsApp account
+- A Gemini API key
 
-\## Features
+## Installation
 
+Clone this repository:
 
-
-\- RSS feed monitoring
-
-\- AI-powered news rewriting in Hindi
-
-\- WhatsApp group message delivery
-
-\- SQLite-based update tracking
-
-\- 10-hour monitoring interval
-
-\- Maximum one news message per monitoring cycle
-
-\- Application-level limit of 3 Gemini requests per day
-
-\- Local storage for WhatsApp session and monitoring history
-
-\- Background execution support on Windows
-
-
-
-\## Tech Stack
-
-
-
-\- Node.js
-
-\- Python
-
-\- Google Gemini API
-
-\- Baileys
-
-\- SQLite
-
-\- RSS Parser
-
-
-
-\## Requirements
-
-
-
-\- Windows 10/11
-
-\- Node.js 20 or later
-
-\- Python 3
-
-\- A WhatsApp account
-
-\- Google Gemini API key
-
-
-
-\## Installation
-
-
-
-Clone the repository:
-
-
-
-```bash
-
-git clone https://github.com/YOUR\_USERNAME/YOUR\_REPOSITORY.git
-
-cd YOUR\_REPOSITORY
-
+```cmd
+git clone https://github.com/ravishankar135-rsp/website-whatsapp-automation.git
+cd website-whatsapp-automation
 ```
 
+Install dependencies and create your private environment file:
 
-
-Install dependencies:
-
-
-
-```bash
-
+```cmd
 npm install
-
-```
-
-
-
-Create your environment file:
-
-
-
-```bash
-
 copy .env.example .env
-
 ```
 
+## Configuration
 
-
-\## Configuration
-
-
-
-Open `.env` and configure:
-
-
+Open `.env` and set your own values:
 
 ```env
-
-GEMINI\_API\_KEY=your\_gemini\_api\_key
-
-WHATSAPP\_GROUP\_JID=your\_group\_jid
-
-AI\_MODEL=gemini-3.5-flash-lite
-
-DRY\_RUN=true
-
+GEMINI_API_KEY=your_gemini_api_key
+WHATSAPP_GROUP_JID=your_whatsapp_group_jid
+AI_MODEL=gemini-3.5-flash-lite
+DRY_RUN=true
 ```
 
+Get a Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey). Review Google's current quota and pricing before use. Do not enable billing if you want to avoid paid usage.
 
+Keep `DRY_RUN=true` while checking your configuration. Set it to `false` only when you are ready to allow live WhatsApp messages.
 
-Keep `DRY\_RUN=true` while testing. Set it to `false` only when you are ready to enable live WhatsApp sending.
+Never commit or share your `.env` file, WhatsApp session folder, database, or logs.
 
+## Configure RSS feeds
 
-
-Never share or commit your `.env` file.
-
-
-
-\## Configure RSS Sources
-
-
-
-Edit:
-
-
-
-```text
-
-config/sources.json
-
-```
-
-
-
-Example:
-
-
+Edit `config/sources.json`. The repository includes a real BBC World RSS feed as an example source:
 
 ```json
-
 {
-
-&#x20; "sources": \[
-
-&#x20;   {
-
-&#x20;     "name": "BBC World",
-
-&#x20;     "type": "rss",
-
-&#x20;     "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
-
-&#x20;     "enabled": true
-
-&#x20;   }
-
-&#x20; ]
-
+  "sources": [
+    {
+      "name": "BBC World",
+      "type": "rss",
+      "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+      "enabled": true
+    }
+  ]
 }
-
 ```
 
+You can add or disable RSS sources. Only add feeds you are permitted to access.
 
+On a fresh installation, the local database is empty. The first check can therefore treat an already-published feed item as new; review the first-run behavior before enabling live delivery.
 
-Add RSS feeds that you are permitted to access.
+## WhatsApp pairing
 
+Stop any running copy of the automation before pairing. Then run:
 
-
-\## WhatsApp Pairing
-
-
-
-Stop the running automation before pairing.
-
-
-
-Run:
-
-
-
-```bash
-
+```cmd
 npm run pair
-
 ```
 
+Scan the QR code from WhatsApp → Linked Devices. Pairing credentials are stored locally in `auth_info_baileys/`. Never share this folder.
 
+## Run
 
-Scan the QR code using WhatsApp → Linked Devices.
+Start the application:
 
-
-
-Your WhatsApp session is stored locally in `auth\_info\_baileys/`. Do not share this folder.
-
-
-
-\## Run the Application
-
-
-
-Start:
-
-
-
-```bash
-
+```cmd
 npm start
-
 ```
 
+The app checks enabled RSS feeds every 10 hours. For live WhatsApp delivery, set `DRY_RUN=false` in your local `.env` file.
 
+## Background startup on Windows
 
-The application checks configured RSS sources every 10 hours.
+The included `start-hidden.vbs` is configured for the original developer's local folder path. If you use a different folder, edit its working directory before configuring Windows Task Scheduler. The computer must be awake, logged in, and have the project drive available for scheduled checks to run.
 
+## Free-tier and cost notes
 
+The application itself does not require paid hosting. The code limits itself to 3 Gemini requests per day, but this is only an application-side limit; it does not guarantee free API usage. Google's model availability, quotas, and pricing can change. Check the current terms and do not configure billing if you want to avoid charges. There is no paid fallback built into this project.
 
-For live delivery, configure `DRY\_RUN=false` in `.env`.
+## Privacy and important notice
 
+- API keys belong only in `.env`.
+- SQLite data is stored in `data/`.
+- WhatsApp session credentials are stored in `auth_info_baileys/`.
+- Logs are stored in `logs/`.
+- These local files and folders are excluded from Git by `.gitignore`.
 
+This project uses Baileys, an unofficial WhatsApp Web integration. It is not affiliated with or endorsed by WhatsApp or Meta. Unofficial integrations may break or carry account-restriction risks. Use responsibly; do not send spam or unsolicited bulk messages.
 
-\## Data and Privacy
+## License
 
-
-
-\- Update history is stored locally in `data/`.
-
-\- WhatsApp session credentials are stored locally in `auth\_info\_baileys/`.
-
-\- Logs are stored locally in `logs/`.
-
-\- API keys and private configuration must remain in `.env`.
-
-\- These private files and folders must not be uploaded to GitHub.
-
-
-
-\## Free-Tier Usage
-
-
-
-This project does not require a paid hosting service.
-
-
-
-Gemini API availability, free quotas, and model limits are controlled by Google and may change. The application has its own limit of 3 AI requests per day. This does not guarantee unlimited free API usage.
-
-
-
-Do not enable billing or configure paid API services if you want to keep the project free.
-
-
-
-\## Important Notice
-
-
-
-This project uses Baileys, an unofficial WhatsApp Web integration. It is not affiliated with or endorsed by WhatsApp or Meta. Use responsibly and understand that unofficial integrations may carry account restrictions or compatibility risks.
-
-
-
-Avoid spam, bulk messaging, and sending content without permission.
-
-
-
-\## License
-
-
-
-MIT License
-
-
-## Repository
-https://github.com/ravishankar135-rsp/website-whatsapp-automation
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
